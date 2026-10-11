@@ -1,9 +1,9 @@
 (function () {
   'use strict';
 
-  const KEY = 'wog_genuss5_popup_closed_until';
+  const KEY = 'wog_genuss5_popup_closed_until_v2';
   const HIDE_DAYS = 7;
-  const DELAY_MS = 2500;
+  const DELAY_MS = 2200;
 
   function isHome() {
     const p = window.location.pathname.replace(/\/+$/, '');
@@ -25,67 +25,211 @@
   }
 
   function closePopup() {
-    const el = document.getElementById('wog-genuss5-overlay');
+    const el = document.getElementById('wog-popup-overlay');
     if (el) el.remove();
     remember();
   }
 
   function init() {
-    if (!isHome() || hidden() || document.getElementById('wog-genuss5-overlay')) return;
+    if (!isHome() || hidden() || document.getElementById('wog-popup-overlay')) return;
 
     const style = document.createElement('style');
     style.textContent = `
-      #wog-genuss5-overlay{position:fixed;inset:0;z-index:2147483000;background:rgba(15,15,15,.72);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}
-      #wog-genuss5-box{position:relative;width:min(92vw,560px);background:linear-gradient(145deg,#171717 0%,#24211d 100%);color:#fff;border:1px solid rgba(210,179,120,.55);border-radius:14px;box-shadow:0 24px 70px rgba(0,0,0,.48);padding:38px 34px 30px;text-align:center;font-family:Arial,Helvetica,sans-serif}
-      #wog-genuss5-box:before{content:'';display:block;width:72px;height:3px;margin:0 auto 22px;background:#c5a268;border-radius:2px}
-      #wog-genuss5-close{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;background:transparent;color:#fff;font-size:28px;cursor:pointer}
-      .wog-kicker{color:#d6b77d;text-transform:uppercase;letter-spacing:2px;font-size:12px;font-weight:700;margin-bottom:8px}
-      .wog-title{margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-size:34px;line-height:1.08;font-weight:700}
-      .wog-value{font-size:46px;line-height:1;font-weight:800;margin:4px 0 8px;color:#d8bb83}
-      .wog-lead{margin:0 auto 18px;max-width:440px;font-size:17px;line-height:1.55;color:#f1ede6}
-      .wog-min{font-size:14px;color:#ddd4c7;margin-bottom:20px}
-      .wog-codewrap{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:0 0 20px}
-      .wog-code{display:inline-block;padding:10px 16px;border:1px dashed #d8bb83;border-radius:8px;background:rgba(255,255,255,.05);letter-spacing:2px;font-size:21px;font-weight:800}
-      .wog-copy{border:0;border-radius:7px;padding:10px 13px;background:#eee7dc;color:#1a1a1a;font-weight:700;cursor:pointer}
-      .wog-cta{display:block;text-decoration:none!important;background:#c5a268;color:#16130f!important;font-weight:800;font-size:16px;padding:14px 18px;border-radius:8px;margin:0 auto 14px}
-      .wog-note{margin:0;font-size:12px;line-height:1.45;color:#c9c1b7}
-      .wog-skip{display:inline-block;margin-top:12px;color:#d6d0c8;font-size:12px;text-decoration:underline;cursor:pointer}
-      @media(max-width:600px){#wog-genuss5-box{padding:30px 20px 24px}.wog-title{font-size:28px}.wog-value{font-size:40px}.wog-lead{font-size:16px}}
+      #wog-popup-overlay{
+        position:fixed;inset:0;z-index:2147483000;
+        background:rgba(12,12,12,.72);
+        display:flex;align-items:center;justify-content:center;
+        padding:20px;box-sizing:border-box;
+        backdrop-filter:blur(3px);
+      }
+      #wog-popup{
+        position:relative;
+        width:min(92vw,520px);
+        box-sizing:border-box;
+        padding:34px 34px 30px;
+        border-radius:18px;
+        border:1px solid rgba(202,168,105,.62);
+        background:
+          radial-gradient(circle at 50% 0%,rgba(199,163,96,.15),transparent 36%),
+          linear-gradient(160deg,#171717 0%,#24211d 100%);
+        color:#fff;
+        box-shadow:0 28px 80px rgba(0,0,0,.48);
+        text-align:center;
+        font-family:Arial,Helvetica,sans-serif;
+      }
+      #wog-popup:before{
+        content:'';
+        display:block;
+        width:64px;height:2px;
+        margin:0 auto 20px;
+        background:#c9a96b;
+      }
+      #wog-popup-close{
+        position:absolute;top:12px;right:14px;
+        width:34px;height:34px;
+        border:0;background:transparent;color:#eee;
+        font-size:27px;line-height:34px;cursor:pointer;opacity:.78;
+      }
+      #wog-popup-close:hover{opacity:1}
+      .wog-eyebrow{
+        margin-bottom:9px;
+        color:#cdb078;
+        font-size:11px;
+        font-weight:700;
+        letter-spacing:2.4px;
+        text-transform:uppercase;
+      }
+      .wog-headline{
+        margin:0;
+        font-family:Georgia,'Times New Roman',serif;
+        font-size:34px;
+        line-height:1.12;
+        font-weight:600;
+        color:#fff;
+      }
+      .wog-subline{
+        margin:12px auto 20px;
+        max-width:420px;
+        color:#ddd6cd;
+        font-size:15px;
+        line-height:1.5;
+      }
+      .wog-offer{
+        margin:0 auto 8px;
+        color:#d7b876;
+        font-family:Georgia,'Times New Roman',serif;
+        font-size:46px;
+        line-height:1;
+        font-weight:700;
+      }
+      .wog-condition{
+        margin-bottom:19px;
+        color:#f2eee8;
+        font-size:14px;
+      }
+      .wog-codebox{
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:10px;
+        flex-wrap:wrap;
+        margin-bottom:18px;
+      }
+      .wog-code{
+        min-width:160px;
+        padding:11px 16px;
+        border:1px dashed #cdb078;
+        border-radius:9px;
+        background:rgba(255,255,255,.035);
+        color:#fff;
+        font-size:20px;
+        font-weight:800;
+        letter-spacing:2px;
+      }
+      .wog-copy{
+        border:1px solid #e3ded6;
+        border-radius:9px;
+        padding:11px 14px;
+        background:#f0ece6;
+        color:#1d1b18;
+        font-weight:700;
+        cursor:pointer;
+      }
+      .wog-cta{
+        display:block;
+        width:100%;
+        box-sizing:border-box;
+        margin:0 auto 12px;
+        padding:14px 18px;
+        border-radius:9px;
+        background:linear-gradient(180deg,#d2b16d,#bc9550);
+        color:#18130d!important;
+        text-decoration:none!important;
+        font-size:16px;
+        font-weight:800;
+        letter-spacing:.2px;
+      }
+      .wog-note{
+        margin:0;
+        color:#bfb7ad;
+        font-size:11.5px;
+        line-height:1.45;
+      }
+      .wog-skip{
+        display:inline-block;
+        margin-top:11px;
+        color:#d8d2cb;
+        font-size:12px;
+        text-decoration:underline;
+        cursor:pointer;
+      }
+      @media(max-width:600px){
+        #wog-popup{padding:30px 20px 24px;border-radius:14px}
+        .wog-headline{font-size:29px}
+        .wog-offer{font-size:42px}
+        .wog-subline{font-size:14px}
+      }
     `;
     document.head.appendChild(style);
 
     const overlay = document.createElement('div');
-    overlay.id = 'wog-genuss5-overlay';
+    overlay.id = 'wog-popup-overlay';
     overlay.innerHTML = `
-      <div id="wog-genuss5-box" role="dialog" aria-modal="true" aria-labelledby="wog-title">
-        <button id="wog-genuss5-close" type="button" aria-label="Fenster schlieÃen">&times;</button>
-        <div class="wog-kicker">Wines of Greece Genussbrief</div>
-        <h2 class="wog-title" id="wog-title">5 â¬ Genussvorteil sichern</h2>
-        <div class="wog-value">5 â¬</div>
-        <p class="wog-lead">Melden Sie sich jetzt zu unserem Genussbrief an und entdecken Sie griechische Weine, Spirituosen und besondere Angebote.</p>
-        <div class="wog-min">5 â¬ Rabatt ab 59 â¬ Warenwert</div>
-        <div class="wog-codewrap">
+      <div id="wog-popup" role="dialog" aria-modal="true" aria-labelledby="wog-headline">
+        <button id="wog-popup-close" type="button" aria-label="Fenster schlie&szlig;en">&times;</button>
+
+        <div class="wog-eyebrow">Wines of Greece Genussbrief</div>
+
+        <h2 class="wog-headline" id="wog-headline">
+          Willkommen bei Wines of Greece
+        </h2>
+
+        <p class="wog-subline">
+          Entdecken Sie Griechenlands Genusswelt und sichern Sie sich jetzt Ihren pers&ouml;nlichen Willkommensvorteil.
+        </p>
+
+        <div class="wog-offer">5 &euro; Rabatt</div>
+        <div class="wog-condition">ab 59 &euro; Warenwert</div>
+
+        <div class="wog-codebox">
           <span class="wog-code">GENUSS5</span>
           <button class="wog-copy" id="wog-copy" type="button">Code kopieren</button>
         </div>
-        <a class="wog-cta" href="/newsletter">Jetzt 5 â¬ sichern</a>
-        <p class="wog-note">Gutschein einmal pro Kunde einlÃ¶sbar. Es gelten die Gutscheinbedingungen im Shop.</p>
-        <span class="wog-skip" id="wog-skip">Nein danke, weiter zum Shop</span>
+
+        <a class="wog-cta" href="/newsletter">
+          Jetzt Genussbrief abonnieren
+        </a>
+
+        <p class="wog-note">
+          Gutschein einmal pro Kunde einl&ouml;sbar. Es gelten die Gutscheinbedingungen im Shop.
+        </p>
+
+        <span class="wog-skip" id="wog-skip">Weiter zum Shop</span>
       </div>`;
+
     document.body.appendChild(overlay);
 
-    document.getElementById('wog-genuss5-close').onclick = closePopup;
+    document.getElementById('wog-popup-close').onclick = closePopup;
     document.getElementById('wog-skip').onclick = closePopup;
-    document.getElementById('wog-copy').onclick = async function () {
-      try { await navigator.clipboard.writeText('GENUSS5'); } catch (e) {}
-      this.textContent = 'Kopiert â';
-      setTimeout(() => this.textContent = 'Code kopieren', 1800);
+
+    document.getElementById('wog-copy').onclick = function () {
+      const btn = this;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText('GENUSS5').catch(function(){});
+      }
+      btn.textContent = 'Kopiert';
+      setTimeout(function(){ btn.textContent = 'Code kopieren'; }, 1500);
     };
-    overlay.addEventListener('click', e => { if (e.target === overlay) closePopup(); });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) closePopup();
+    });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(init, DELAY_MS));
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(init, DELAY_MS);
+    });
   } else {
     setTimeout(init, DELAY_MS);
   }
